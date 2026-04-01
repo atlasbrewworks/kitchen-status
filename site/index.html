@@ -379,10 +379,29 @@
 </div>
 
 <script>
+// ── REDIRECT FIRST — before any render ──
+const params = new URLSearchParams(window.location.search);
+const tableNum = params.get('table');
+
+if (tableNum) {
+  const saved = localStorage.getItem('kitchenStatus');
+  if (saved) {
+    try {
+      const s = JSON.parse(saved);
+      if (s.color === 'green') {
+        window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
+      }
+    } catch(e) {}
+  } else {
+    // No status set yet — default is green, send straight to bbot
+    window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
+  }
+}
+
 const presets = {
   green: { range: '10–15', msg: "Kitchen is running smoothly. Place your order and we'll get started!", color: 'green' },
-  amber: { range: '20–25', msg: "Freshness takes time! Your order is worth the wait! Drinks arrive first!", color: 'amber' },
-  red:   { range: '30–40', msg: "Freshness takes time! — we appreciate your patience. Drinks arrive first!", color: 'red' }
+  amber: { range: '20–25', msg: "We're a bit busy right now. Your order is worth the wait!", color: 'amber' },
+  red:   { range: '30–40', msg: "Kitchen is backed up — we appreciate your patience. Drinks and apps arrive first!", color: 'red' }
 };
 
 let currentState = { range: '10–15', color: 'green', msg: presets.green.msg };
@@ -431,31 +450,22 @@ function toggleAdmin() {
   document.getElementById('admin-panel').classList.toggle('visible');
 }
 
-// Table routing — read ?table= from URL and build bbot link
-const params = new URLSearchParams(window.location.search);
-const tableNum = params.get('table');
 const btn = document.getElementById('orderBtn');
 const tableLabel = document.getElementById('tableLabel');
-
 if (tableNum) {
-  const bbotUrl = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
-  btn.href = bbotUrl;
+  btn.href = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
   tableLabel.textContent = 'Table ' + tableNum;
 } else {
   btn.style.display = 'none';
   tableLabel.style.display = 'none';
 }
 
-// Restore from localStorage on load
-const saved = localStorage.getItem('kitchenStatus');
-if (saved) {
+// Restore saved state
+const savedState = localStorage.getItem('kitchenStatus');
+if (savedState) {
   try {
-    const s = JSON.parse(saved);
+    const s = JSON.parse(savedState);
     applyState(s.range, s.color, s.msg);
-    // If green AND this is a guest (has table param), skip straight to bbot
-    if (s.color === 'green' && tableNum) {
-      window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
-    }
   } catch(e) {}
 }
 </script>
