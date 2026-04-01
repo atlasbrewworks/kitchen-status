@@ -436,12 +436,12 @@ const params = new URLSearchParams(window.location.search);
 const tableNum = params.get('table');
 const btn = document.getElementById('orderBtn');
 const tableLabel = document.getElementById('tableLabel');
+
 if (tableNum) {
   const bbotUrl = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
   btn.href = bbotUrl;
   tableLabel.textContent = 'Table ' + tableNum;
 } else {
-  // No table param — this is staff viewing the admin page directly
   btn.style.display = 'none';
   tableLabel.style.display = 'none';
 }
@@ -452,6 +452,10 @@ if (saved) {
   try {
     const s = JSON.parse(saved);
     applyState(s.range, s.color, s.msg);
+    // If green AND this is a guest (has table param), skip straight to bbot
+    if (s.color === 'green' && tableNum) {
+      window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
+    }
   } catch(e) {}
 }
 </script>
