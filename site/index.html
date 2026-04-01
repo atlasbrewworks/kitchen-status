@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   :root {
     --green: #2ECC71;
     --amber: #F39C12;
@@ -20,7 +20,7 @@
     --mono: 'DM Mono', monospace;
     --display: 'Syne', sans-serif;
   }
- 
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -32,14 +32,14 @@
     justify-content: center;
     padding: 24px;
   }
- 
+
   /* --- CUSTOMER WIDGET --- */
   #widget {
     width: 100%;
     max-width: 480px;
     text-align: center;
   }
- 
+
   .status-ring {
     width: 140px;
     height: 140px;
@@ -67,7 +67,7 @@
   .status-ring.amber::after { border-color: rgba(243,156,18,0.25); }
   .status-ring.red { border-color: var(--red); box-shadow: 0 0 40px rgba(231,76,60,0.15); }
   .status-ring.red::after { border-color: rgba(231,76,60,0.25); }
- 
+
   .label {
     font-family: var(--display);
     font-size: 13px;
@@ -76,7 +76,7 @@
     color: var(--muted);
     margin-bottom: 8px;
   }
- 
+
   .wait-time {
     font-family: var(--display);
     font-size: 64px;
@@ -88,14 +88,14 @@
   .wait-time.green { color: var(--green); }
   .wait-time.amber { color: var(--amber); }
   .wait-time.red { color: var(--red); }
- 
+
   .wait-unit {
     font-size: 14px;
     color: var(--muted);
     letter-spacing: 0.1em;
     margin-bottom: 24px;
   }
- 
+
   .status-message {
     font-size: 14px;
     color: rgba(240,237,232,0.6);
@@ -104,25 +104,59 @@
     margin: 0 auto 32px;
     min-height: 44px;
   }
- 
+
   .last-updated {
     font-size: 11px;
     color: var(--muted);
     letter-spacing: 0.05em;
+    margin-bottom: 32px;
   }
- 
+
+  .order-btn {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 12px;
+    padding: 18px 24px;
+    background: var(--text);
+    color: var(--bg);
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: opacity 0.2s;
+  }
+  .order-btn:hover { opacity: 0.85; }
+  .order-btn.green { background: var(--green); color: #0D0D0D; }
+  .order-btn.amber { background: var(--amber); color: #0D0D0D; }
+  .order-btn.red   { background: var(--text);  color: var(--bg); }
+
+  .table-label {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
   .divider {
     border: none;
     border-top: 1px solid var(--border);
     margin: 40px 0;
   }
- 
+
   /* --- ADMIN PANEL --- */
   #admin {
     width: 100%;
     max-width: 480px;
   }
- 
+
   .admin-toggle {
     text-align: center;
     margin-bottom: 32px;
@@ -141,7 +175,7 @@
     text-transform: uppercase;
   }
   .admin-toggle button:hover { border-color: var(--text); color: var(--text); }
- 
+
   #admin-panel {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -150,7 +184,7 @@
     display: none;
   }
   #admin-panel.visible { display: block; }
- 
+
   .admin-heading {
     font-family: var(--display);
     font-size: 11px;
@@ -159,14 +193,14 @@
     color: var(--muted);
     margin-bottom: 20px;
   }
- 
+
   .quick-btns {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
     margin-bottom: 20px;
   }
- 
+
   .quick-btn {
     padding: 14px 8px;
     border-radius: 8px;
@@ -183,20 +217,20 @@
   .quick-btn.active-green { border-color: var(--green); background: rgba(46,204,113,0.08); }
   .quick-btn.active-amber { border-color: var(--amber); background: rgba(243,156,18,0.08); }
   .quick-btn.active-red { border-color: var(--red); background: rgba(231,76,60,0.08); }
- 
+
   .quick-btn .btn-dot {
     width: 8px; height: 8px; border-radius: 50%;
     margin: 0 auto 6px;
   }
   .quick-btn .btn-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
- 
+
   .custom-row {
     display: flex;
     gap: 8px;
     margin-bottom: 16px;
     align-items: center;
   }
- 
+
   .custom-row input[type="number"] {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -210,9 +244,9 @@
     outline: none;
   }
   .custom-row input[type="number"]:focus { border-color: #555; }
- 
+
   .custom-row span { color: var(--muted); font-size: 13px; }
- 
+
   .message-input {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -230,7 +264,7 @@
   }
   .message-input:focus { border-color: #555; }
   .message-input::placeholder { color: #3a3a3a; }
- 
+
   .set-btn {
     width: 100%;
     background: var(--text);
@@ -248,7 +282,7 @@
   }
   .set-btn:hover { opacity: 0.85; }
   .set-btn:active { opacity: 0.7; }
- 
+
   .confirm-flash {
     text-align: center;
     font-size: 12px;
@@ -260,7 +294,7 @@
     transition: opacity 0.3s;
   }
   .confirm-flash.show { opacity: 1; }
- 
+
   /* embed hint */
   .embed-hint {
     margin-top: 20px;
@@ -282,7 +316,7 @@
 </style>
 </head>
 <body>
- 
+
 <!-- CUSTOMER WIDGET (top half) -->
 <div id="widget">
   <p class="label">Current kitchen wait</p>
@@ -291,19 +325,21 @@
   <div class="wait-unit">minutes</div>
   <p class="status-message" id="msgDisplay">Kitchen is running smoothly. Place your order and we'll get started!</p>
   <p class="last-updated" id="updatedDisplay">Updated just now</p>
+  <a id="orderBtn" class="order-btn green" href="#">Place My Order →</a>
+  <p class="table-label" id="tableLabel"></p>
 </div>
- 
+
 <hr class="divider">
- 
+
 <!-- STAFF ADMIN (bottom half) -->
 <div id="admin">
   <div class="admin-toggle">
     <button onclick="toggleAdmin()">⚙ Staff update</button>
   </div>
- 
+
   <div id="admin-panel">
     <p class="admin-heading">Set kitchen status</p>
- 
+
     <div class="quick-btns">
       <button class="quick-btn active-green" id="btn-green" onclick="setPreset('green')">
         <div class="btn-dot" style="background:var(--green)"></div>
@@ -321,7 +357,7 @@
         <div class="btn-label">Backed up</div>
       </button>
     </div>
- 
+
     <p class="admin-heading" style="margin-top:16px">Custom time</p>
     <div class="custom-row">
       <input type="number" id="customMin" min="1" max="120" placeholder="15"> 
@@ -329,28 +365,28 @@
       <input type="number" id="customMax" min="1" max="120" placeholder="20">
       <span>min</span>
     </div>
- 
+
     <textarea class="message-input" id="customMsg" placeholder="Optional note to guests (e.g. 'Happy Hour orders may take longer')"></textarea>
- 
+
     <button class="set-btn" onclick="applyCustom()">Update wait time</button>
     <div class="confirm-flash" id="confirmFlash">✓ Status updated</div>
- 
+
     <div class="embed-hint">
       <strong style="color:var(--text)">Embed in bbot:</strong> Go to Owner Portal → Menu Customization → Custom Header HTML and add:<br>
       <code>&lt;iframe src="YOUR_DEPLOYED_URL" style="width:100%;border:none;height:180px"&gt;&lt;/iframe&gt;</code>
     </div>
   </div>
 </div>
- 
+
 <script>
 const presets = {
   green: { range: '10–15', msg: "Kitchen is running smoothly. Place your order and we'll get started!", color: 'green' },
   amber: { range: '20–25', msg: "We're a bit busy right now. Your order is worth the wait!", color: 'amber' },
-  red:   { range: '30–40', msg: "Kitchen is backed up — we appreciate your patience. Drinks arrive first!", color: 'red' }
+  red:   { range: '30–40', msg: "Kitchen is backed up — we appreciate your patience. Drinks and apps arrive first!", color: 'red' }
 };
- 
+
 let currentState = { range: '10–15', color: 'green', msg: presets.green.msg };
- 
+
 function applyState(range, color, msg) {
   currentState = { range, color, msg };
   document.getElementById('timeDisplay').textContent = range;
@@ -358,9 +394,10 @@ function applyState(range, color, msg) {
   document.getElementById('ring').className = 'status-ring ' + color;
   document.getElementById('msgDisplay').textContent = msg;
   document.getElementById('updatedDisplay').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  document.getElementById('orderBtn').className = 'order-btn ' + color;
   localStorage.setItem('kitchenStatus', JSON.stringify({ range, color, msg, ts: Date.now() }));
 }
- 
+
 function setPreset(key) {
   const p = presets[key];
   applyState(p.range, p.color, p.msg);
@@ -369,7 +406,7 @@ function setPreset(key) {
   });
   flash();
 }
- 
+
 function applyCustom() {
   const minV = document.getElementById('customMin').value;
   const maxV = document.getElementById('customMax').value;
@@ -383,17 +420,32 @@ function applyCustom() {
   ['green','amber','red'].forEach(k => document.getElementById('btn-' + k).className = 'quick-btn');
   flash();
 }
- 
+
 function flash() {
   const el = document.getElementById('confirmFlash');
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2000);
 }
- 
+
 function toggleAdmin() {
   document.getElementById('admin-panel').classList.toggle('visible');
 }
- 
+
+// Table routing — read ?table= from URL and build bbot link
+const params = new URLSearchParams(window.location.search);
+const tableNum = params.get('table');
+const btn = document.getElementById('orderBtn');
+const tableLabel = document.getElementById('tableLabel');
+if (tableNum) {
+  const bbotUrl = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
+  btn.href = bbotUrl;
+  tableLabel.textContent = 'Table ' + tableNum;
+} else {
+  // No table param — this is staff viewing the admin page directly
+  btn.style.display = 'none';
+  tableLabel.style.display = 'none';
+}
+
 // Restore from localStorage on load
 const saved = localStorage.getItem('kitchenStatus');
 if (saved) {
@@ -405,4 +457,3 @@ if (saved) {
 </script>
 </body>
 </html>
- 
