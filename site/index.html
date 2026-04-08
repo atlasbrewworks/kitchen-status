@@ -4,22 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kitchen Status</title>
-
-<script>
-  (function() {
-    var params = new URLSearchParams(window.location.search);
-    var tableNum = params.get('table');
-    if (tableNum) {
-      var saved = localStorage.getItem('kitchenStatus');
-      var color = 'green';
-      if (saved) { try { color = JSON.parse(saved).color; } catch(e) {} }
-      if (color === 'green') {
-        window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
-      }
-    }
-  })();
-</script>
-
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,8 +17,12 @@
     background: var(--bg); color: var(--text); font-family: var(--mono);
     min-height: 100vh; display: flex; flex-direction: column;
     align-items: center; justify-content: center; padding: 24px;
+    opacity: 0; transition: opacity 0.2s ease;
   }
+  body.ready { opacity: 1; }
+
   #widget { width: 100%; max-width: 480px; text-align: center; }
+
   .status-ring {
     width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 28px;
     display: flex; align-items: center; justify-content: center; font-size: 48px;
@@ -51,6 +39,7 @@
   .status-ring.amber::after { border-color: rgba(243,156,18,0.25); }
   .status-ring.red { border-color: var(--red); box-shadow: 0 0 40px rgba(231,76,60,0.15); }
   .status-ring.red::after { border-color: rgba(231,76,60,0.25); }
+
   .label {
     font-family: var(--display); font-size: 13px; letter-spacing: 0.18em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
@@ -68,6 +57,7 @@
     max-width: 300px; margin: 0 auto 32px; min-height: 44px;
   }
   .last-updated { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 32px; }
+
   .order-btn {
     display: block; width: 100%; max-width: 320px; margin: 0 auto 12px;
     padding: 18px 24px; background: var(--text); color: var(--bg);
@@ -80,8 +70,10 @@
   .order-btn.green { background: var(--green); color: #0D0D0D; }
   .order-btn.amber { background: var(--amber); color: #0D0D0D; }
   .order-btn.red   { background: var(--text);  color: var(--bg); }
+
   .table-label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-align: center; margin-bottom: 40px; }
   .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
+
   #admin { width: 100%; max-width: 480px; }
   .admin-toggle { text-align: center; margin-bottom: 32px; }
   .admin-toggle button {
@@ -91,11 +83,13 @@
     transition: border-color 0.2s, color 0.2s; text-transform: uppercase;
   }
   .admin-toggle button:hover { border-color: var(--text); color: var(--text); }
+
   #admin-panel {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 28px; display: none;
   }
   #admin-panel.visible { display: block; }
+
   .admin-heading {
     font-family: var(--display); font-size: 11px; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
@@ -112,6 +106,7 @@
   .quick-btn.active-red   { border-color: var(--red);   background: rgba(231,76,60,0.08); }
   .quick-btn .btn-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 6px; }
   .quick-btn .btn-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
   .custom-row { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
   .custom-row input[type="number"] {
     background: var(--bg); border: 1px solid var(--border); color: var(--text);
@@ -120,6 +115,7 @@
   }
   .custom-row input[type="number"]:focus { border-color: #555; }
   .custom-row span { color: var(--muted); font-size: 13px; }
+
   .message-input {
     background: var(--bg); border: 1px solid var(--border); color: var(--text);
     font-family: var(--mono); font-size: 13px; padding: 10px 14px;
@@ -128,6 +124,7 @@
   }
   .message-input:focus { border-color: #555; }
   .message-input::placeholder { color: #3a3a3a; }
+
   .set-btn {
     width: 100%; background: var(--text); color: var(--bg);
     font-family: var(--display); font-weight: 700; font-size: 13px;
@@ -136,6 +133,7 @@
   }
   .set-btn:hover { opacity: 0.85; }
   .set-btn:active { opacity: 0.7; }
+
   .confirm-flash {
     text-align: center; font-size: 12px; color: var(--green);
     letter-spacing: 0.05em; height: 20px; margin-top: 10px;
@@ -171,7 +169,7 @@
         <div style="font-size:15px;margin-bottom:2px">10–15</div>
         <div class="btn-label">Smooth</div>
       </button>
-      <button class="quick-btn active-amber" id="btn-amber" onclick="setPreset('amber')">
+      <button class="quick-btn" id="btn-amber" onclick="setPreset('amber')">
         <div class="btn-dot" style="background:var(--amber)"></div>
         <div style="font-size:15px;margin-bottom:2px">20–25</div>
         <div class="btn-label">Moderate</div>
@@ -198,6 +196,7 @@
 <script>
   var params = new URLSearchParams(window.location.search);
   var tableNum = params.get('table');
+  var isGuest = !!tableNum;
 
   var presets = {
     green: { range: '10–15', msg: "Kitchen is running smoothly. Place your order and we'll get started!", color: 'green' },
@@ -205,23 +204,47 @@
     red:   { range: '30–40', msg: "Kitchen is backed up — we appreciate your patience. Drinks and apps arrive first!", color: 'red' }
   };
 
-  function applyState(range, color, msg) {
+  // Set up order button
+  var btn = document.getElementById('orderBtn');
+  var tableLabel = document.getElementById('tableLabel');
+  if (tableNum) {
+    btn.href = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
+    tableLabel.textContent = 'Table ' + tableNum;
+  } else {
+    btn.style.display = 'none';
+    tableLabel.style.display = 'none';
+  }
+
+  function applyState(range, color, msg, ts) {
     document.getElementById('timeDisplay').textContent = range;
     document.getElementById('timeDisplay').className = 'wait-time ' + color;
     document.getElementById('ring').className = 'status-ring ' + color;
     document.getElementById('msgDisplay').textContent = msg;
-    document.getElementById('updatedDisplay').textContent = 'Updated ' + new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     document.getElementById('orderBtn').className = 'order-btn ' + color;
-    localStorage.setItem('kitchenStatus', JSON.stringify({ range: range, color: color, msg: msg, ts: Date.now() }));
+    if (ts) {
+      var d = new Date(ts);
+      document.getElementById('updatedDisplay').textContent = 'Updated ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    }
+    // Highlight active preset button
+    ['green','amber','red'].forEach(function(k) {
+      document.getElementById('btn-' + k).className = 'quick-btn' + (k === color ? ' active-' + k : '');
+    });
+  }
+
+  function pushStatus(range, color, msg) {
+    fetch('/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ range: range, color: color, msg: msg })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(s) { applyState(s.range, s.color, s.msg, s.ts); flash(); })
+    .catch(function(e) { console.error('Failed to update status', e); });
   }
 
   function setPreset(key) {
     var p = presets[key];
-    applyState(p.range, p.color, p.msg);
-    ['green','amber','red'].forEach(function(k) {
-      document.getElementById('btn-' + k).className = 'quick-btn' + (k === key ? ' active-' + k : '');
-    });
-    flash();
+    pushStatus(p.range, p.color, p.msg);
   }
 
   function applyCustom() {
@@ -229,15 +252,11 @@
     var maxV = document.getElementById('customMax').value;
     var msg  = document.getElementById('customMsg').value.trim();
     if (!minV) return;
-    var range = maxV ? minV + '\u201325' : minV + '+';
+    var range = maxV ? minV + '–' + maxV : minV + '+';
     var mins = parseInt(minV);
     var color = mins <= 15 ? 'green' : mins <= 25 ? 'amber' : 'red';
     var finalMsg = msg || presets[color].msg;
-    applyState(range, color, finalMsg);
-    ['green','amber','red'].forEach(function(k) {
-      document.getElementById('btn-' + k).className = 'quick-btn';
-    });
-    flash();
+    pushStatus(range, color, finalMsg);
   }
 
   function flash() {
@@ -250,26 +269,26 @@
     document.getElementById('admin-panel').classList.toggle('visible');
   }
 
-  var btn = document.getElementById('orderBtn');
-  var tableLabel = document.getElementById('tableLabel');
-  if (tableNum) {
-    btn.href = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
-    tableLabel.textContent = 'Table ' + tableNum;
-  } else {
-    btn.style.display = 'none';
-    tableLabel.style.display = 'none';
-  }
-
-  var savedState = localStorage.getItem('kitchenStatus');
-  if (savedState) {
-    try {
-      var s = JSON.parse(savedState);
-      applyState(s.range, s.color, s.msg);
-      ['green','amber','red'].forEach(function(k) {
-        document.getElementById('btn-' + k).className = 'quick-btn' + (k === s.color ? ' active-' + k : '');
-      });
-    } catch(e) {}
-  }
+  // Fetch current status from server, then decide what to show
+  fetch('/status')
+    .then(function(r) { return r.json(); })
+    .then(function(s) {
+      if (isGuest && s.color === 'green') {
+        // Green + guest = straight to bbot, no splash
+        window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
+      } else {
+        applyState(s.range, s.color, s.msg, s.ts);
+        document.body.classList.add('ready');
+      }
+    })
+    .catch(function() {
+      // If server unreachable, default to showing bbot for guests
+      if (isGuest) {
+        window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
+      } else {
+        document.body.classList.add('ready');
+      }
+    });
 </script>
 </body>
 </html>
