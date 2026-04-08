@@ -3,6 +3,7 @@ const app = express();
 
 // Status lives in server memory — shared across all devices
 let status = { range: '10–15', color: 'green', msg: "Kitchen is running smoothly.", ts: Date.now() };
+// v2
 
 app.use(express.json());
 app.use(express.static('site'));
