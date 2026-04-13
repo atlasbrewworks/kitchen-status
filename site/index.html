@@ -20,9 +20,7 @@
     opacity: 0; transition: opacity 0.2s ease;
   }
   body.ready { opacity: 1; }
-
   #widget { width: 100%; max-width: 480px; text-align: center; }
-
   .status-ring {
     width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 28px;
     display: flex; align-items: center; justify-content: center; font-size: 48px;
@@ -39,7 +37,6 @@
   .status-ring.amber::after { border-color: rgba(243,156,18,0.25); }
   .status-ring.red { border-color: var(--red); box-shadow: 0 0 40px rgba(231,76,60,0.15); }
   .status-ring.red::after { border-color: rgba(231,76,60,0.25); }
-
   .label {
     font-family: var(--display); font-size: 13px; letter-spacing: 0.18em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
@@ -54,10 +51,14 @@
   .wait-unit { font-size: 14px; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 24px; }
   .status-message {
     font-size: 14px; color: rgba(240,237,232,0.6); line-height: 1.6;
-    max-width: 300px; margin: 0 auto 32px; min-height: 44px;
+    max-width: 300px; margin: 0 auto 16px; min-height: 44px;
   }
-  .last-updated { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 32px; }
-
+  .last-updated { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 16px; }
+  .countdown {
+    font-size: 12px; color: var(--muted); letter-spacing: 0.06em;
+    margin-bottom: 24px; min-height: 18px;
+  }
+  .countdown span { color: var(--text); font-weight: 500; }
   .order-btn {
     display: block; width: 100%; max-width: 320px; margin: 0 auto 12px;
     padding: 18px 24px; background: var(--text); color: var(--bg);
@@ -70,10 +71,8 @@
   .order-btn.green { background: var(--green); color: #0D0D0D; }
   .order-btn.amber { background: var(--amber); color: #0D0D0D; }
   .order-btn.red   { background: var(--text);  color: var(--bg); }
-
   .table-label { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; text-align: center; margin-bottom: 40px; }
   .divider { border: none; border-top: 1px solid var(--border); margin: 40px 0; }
-
   #admin { width: 100%; max-width: 480px; }
   .admin-toggle { text-align: center; margin-bottom: 32px; }
   .admin-toggle button {
@@ -83,13 +82,11 @@
     transition: border-color 0.2s, color 0.2s; text-transform: uppercase;
   }
   .admin-toggle button:hover { border-color: var(--text); color: var(--text); }
-
   #admin-panel {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 28px; display: none;
   }
   #admin-panel.visible { display: block; }
-
   .admin-heading {
     font-family: var(--display); font-size: 11px; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--muted); margin-bottom: 20px;
@@ -106,7 +103,6 @@
   .quick-btn.active-red   { border-color: var(--red);   background: rgba(231,76,60,0.08); }
   .quick-btn .btn-dot { width: 8px; height: 8px; border-radius: 50%; margin: 0 auto 6px; }
   .quick-btn .btn-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-
   .custom-row { display: flex; gap: 8px; margin-bottom: 16px; align-items: center; }
   .custom-row input[type="number"] {
     background: var(--bg); border: 1px solid var(--border); color: var(--text);
@@ -115,7 +111,6 @@
   }
   .custom-row input[type="number"]:focus { border-color: #555; }
   .custom-row span { color: var(--muted); font-size: 13px; }
-
   .message-input {
     background: var(--bg); border: 1px solid var(--border); color: var(--text);
     font-family: var(--mono); font-size: 13px; padding: 10px 14px;
@@ -124,7 +119,6 @@
   }
   .message-input:focus { border-color: #555; }
   .message-input::placeholder { color: #3a3a3a; }
-
   .set-btn {
     width: 100%; background: var(--text); color: var(--bg);
     font-family: var(--display); font-weight: 700; font-size: 13px;
@@ -133,7 +127,6 @@
   }
   .set-btn:hover { opacity: 0.85; }
   .set-btn:active { opacity: 0.7; }
-
   .confirm-flash {
     text-align: center; font-size: 12px; color: var(--green);
     letter-spacing: 0.05em; height: 20px; margin-top: 10px;
@@ -151,6 +144,7 @@
   <div class="wait-unit">minutes</div>
   <p class="status-message" id="msgDisplay">We're a bit busy right now. Your order is worth the wait!</p>
   <p class="last-updated" id="updatedDisplay">Updated just now</p>
+  <p class="countdown" id="countdown"></p>
   <a id="orderBtn" class="order-btn amber" href="#">Place My Order →</a>
   <p class="table-label" id="tableLabel"></p>
 </div>
@@ -197,7 +191,9 @@
   var params = new URLSearchParams(window.location.search);
   var tableNum = params.get('table');
   var isGuest = !!tableNum;
+  var countdownTimer = null;
 
+  // ── Edit your splash screen messages here ──
   var presets = {
     green: { range: '10–15', msg: "Kitchen is running smoothly. Place your order and we'll get started!", color: 'green' },
     amber: { range: '20–25', msg: "We're a bit busy right now. Your order is worth the wait!", color: 'amber' },
@@ -213,6 +209,23 @@
   } else {
     btn.style.display = 'none';
     tableLabel.style.display = 'none';
+    document.getElementById('countdown').style.display = 'none';
+  }
+
+  function startCountdown(bbotUrl) {
+    var secs = 20;
+    var countdownEl = document.getElementById('countdown');
+    countdownEl.innerHTML = 'Redirecting to order in <span>' + secs + '</span>s — or tap below';
+
+    countdownTimer = setInterval(function() {
+      secs--;
+      if (secs <= 0) {
+        clearInterval(countdownTimer);
+        window.location.href = bbotUrl;
+      } else {
+        countdownEl.innerHTML = 'Redirecting to order in <span>' + secs + '</span>s — or tap below';
+      }
+    }, 1000);
   }
 
   function applyState(range, color, msg, ts) {
@@ -225,7 +238,6 @@
       var d = new Date(ts);
       document.getElementById('updatedDisplay').textContent = 'Updated ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     }
-    // Highlight active preset button
     ['green','amber','red'].forEach(function(k) {
       document.getElementById('btn-' + k).className = 'quick-btn' + (k === color ? ' active-' + k : '');
     });
@@ -257,6 +269,10 @@
     var color = mins <= 15 ? 'green' : mins <= 25 ? 'amber' : 'red';
     var finalMsg = msg || presets[color].msg;
     pushStatus(range, color, finalMsg);
+    ['green','amber','red'].forEach(function(k) {
+      document.getElementById('btn-' + k).className = 'quick-btn';
+    });
+    flash();
   }
 
   function flash() {
@@ -269,7 +285,7 @@
     document.getElementById('admin-panel').classList.toggle('visible');
   }
 
-  // Fetch current status from server, then decide what to show
+  // Fetch status from server, then decide what to show
   fetch('/status')
     .then(function(r) { return r.json(); })
     .then(function(s) {
@@ -279,10 +295,14 @@
       } else {
         applyState(s.range, s.color, s.msg, s.ts);
         document.body.classList.add('ready');
+        // Start 20-second countdown for guests on amber/red
+        if (isGuest) {
+          var bbotUrl = 'https://bridgedistrict.atlasanddabo.menu/' + tableNum;
+          startCountdown(bbotUrl);
+        }
       }
     })
     .catch(function() {
-      // If server unreachable, default to showing bbot for guests
       if (isGuest) {
         window.location.replace('https://bridgedistrict.atlasanddabo.menu/' + tableNum);
       } else {
